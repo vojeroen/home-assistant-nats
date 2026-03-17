@@ -1,0 +1,12 @@
+{
+  "domain": "nats_io",
+  "name": "NATS",
+  "codeowners": ["@vojeroen"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://www.home-assistant.io/integrations/nats_io",
+  "integration_type": "service",
+  "iot_class": "local_push",
+  "requirements": ["nats-py==2.14.0"],
+  "version": "0.0.1"
+}

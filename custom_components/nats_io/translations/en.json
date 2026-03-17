@@ -1,0 +1,28 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Service is already configured"
+        },
+        "error": {
+            "cannot_connect": "Failed to connect",
+            "invalid_auth": "Invalid authentication",
+            "unknown": "Unexpected error"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "host": "Host",
+                    "password": "Password",
+                    "port": "Port",
+                    "username": "Username"
+                },
+                "data_description": {
+                    "host": "The hostname or IP address of the NATS broker.",
+                    "password": "The password for authenticating with the NATS broker.",
+                    "port": "The port number of the NATS broker (default: 4222).",
+                    "username": "The username for authenticating with the NATS broker."
+                }
+            }
+        }
+    }
+}
