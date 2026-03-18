@@ -124,6 +124,46 @@ Send a notification:
 }
 ```
 
+### State requests
+
+Request the current state of any entity by publishing to `ha.request.state` with a reply subject set. The integration responds directly to the reply subject.
+
+**Subject:** `ha.request.state`
+
+**Request payload:**
+
+```json
+{
+  "entity_id": "light.living_room"
+}
+```
+
+**Response payload** (same fields as a state change event):
+
+```json
+{
+  "entity_id": "light.living_room",
+  "device_id": "a1b2c3d4e5f6",
+  "area_id": "living_room",
+  "state": "on",
+  "attributes": {
+    "brightness": 128,
+    "friendly_name": "Living Room Light"
+  },
+  "last_changed": "2024-01-15T12:34:56.789012+00:00"
+}
+```
+
+If the entity is not found, the response is:
+
+```json
+{
+  "error": "Entity 'light.unknown' not found"
+}
+```
+
+> **Note:** The message must include a reply subject (NATS request/reply pattern). Messages without a reply subject are ignored.
+
 ## Troubleshooting
 
 - **Cannot connect** — verify the broker host, port, and that it is reachable from Home Assistant. Check if TLS is correctly configured on both sides.

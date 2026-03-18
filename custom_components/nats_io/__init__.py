@@ -112,15 +112,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: NatsIoConfigEntry) -> bo
 
     await nc.subscribe("ha.service", cb=_async_service_command_handler)
 
-    async def _async_state_changed_listener(event: Event[EventStateChangedData]) -> None:
-        """Publish state changes to NATS."""
-        new_state = event.data.get("new_state")
-        if new_state is None:
-            return
+    def _build_state_payload(entity_id: str) -> dict[str, Any] | None:
+        """Build the state payload for an entity, or return None if not found."""
+        state = hass.states.get(entity_id)
+        if state is None:
+            return None
 
         area_id: str | None = None
         device_id: str | None = None
-        entity_entry = er.async_get(hass).async_get(new_state.entity_id)
+        entity_entry = er.async_get(hass).async_get(entity_id)
         if entity_entry:
             area_id = entity_entry.area_id
             device_id = entity_entry.device_id
@@ -129,16 +129,65 @@ async def async_setup_entry(hass: HomeAssistant, entry: NatsIoConfigEntry) -> bo
                 if device:
                     area_id = device.area_id
 
-        subject = f"ha.state.{area_id or 'no_area'}.{new_state.entity_id}"
-        payload: dict[str, Any] = {
+        return {
             "timestamp": datetime.now(UTC).isoformat(),
-            "entity_id": new_state.entity_id,
+            "entity_id": state.entity_id,
             "device_id": device_id,
             "area_id": area_id,
-            "state": new_state.state,
-            "attributes": dict(new_state.attributes),
-            "last_changed": new_state.last_changed.isoformat(),
+            "state": state.state,
+            "attributes": dict(state.attributes),
+            "last_changed": state.last_changed.isoformat(),
         }
+
+    async def _async_state_request_handler(msg: NatsMsg) -> None:
+        """Handle incoming state requests on ha.request.state.
+
+        Expected payload: JSON object with required "entity_id" key,
+        e.g. {"entity_id": "light.living_room"}
+        Response payload mirrors the ha.state.* publish format.
+        """
+        if not msg.reply:
+            _LOGGER.warning("Received ha.request.state message without a reply subject")
+            return
+
+        try:
+            payload: dict[str, Any] = json.loads(msg.data.decode()) if msg.data else {}
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            _LOGGER.warning(
+                "Failed to decode NATS message payload on subject %s", msg.subject
+            )
+            return
+
+        entity_id: str = payload.get("entity_id", "")
+        if not entity_id:
+            _LOGGER.warning("Received ha.request.state message without 'entity_id'")
+            return
+
+        state_payload = _build_state_payload(entity_id)
+        if state_payload is None:
+            response: dict[str, Any] = {"error": f"Entity {entity_id!r} not found"}
+        else:
+            response = state_payload
+
+        try:
+            await nc.publish(msg.reply, json.dumps(response).encode())
+        except Exception as err:
+            _LOGGER.warning("Failed to publish state response to NATS: %s", err)
+
+    await nc.subscribe("ha.request.state", cb=_async_state_request_handler)
+
+    async def _async_state_changed_listener(event: Event[EventStateChangedData]) -> None:
+        """Publish state changes to NATS."""
+        new_state = event.data.get("new_state")
+        if new_state is None:
+            return
+
+        state_payload = _build_state_payload(new_state.entity_id)
+        if state_payload is None:
+            return
+
+        subject = f"ha.state.{state_payload['area_id'] or 'no_area'}.{new_state.entity_id}"
+        payload = state_payload
 
         try:
             await nc.publish(subject, json.dumps(payload).encode())

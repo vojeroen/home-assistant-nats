@@ -52,6 +52,15 @@ Follow standard Home Assistant integration patterns:
 - Use `drain()` (not `close()`) to shut down the NATS connection gracefully.
 - Keep imports ordered: stdlib → third-party → homeassistant → local.
 
+## Versioning
+
+Before every commit, bump the `version` field in `custom_components/nats_io/manifest.json` following [semver](https://semver.org/):
+- **Patch** (`0.0.x`) — bug fixes, internal refactors with no behaviour change
+- **Minor** (`0.x.0`) — new features or subjects, backwards-compatible
+- **Major** (`x.0.0`) — breaking changes to message contracts or config
+
+Propose the version increment and confirm with the user before committing. After the commit, attach a git tag in the format `vX.Y.Z` to that commit.
+
 ## README
 
 `README.md` is rendered by HACS as the integration's store page (`"render_readme": true` in `hacs.json`). **Keep it up to date whenever you make changes that affect:**
