@@ -30,6 +30,17 @@ _LOGGER = logging.getLogger(__name__)
 type NatsIoConfigEntry = ConfigEntry[NatsClient]
 
 
+class _HAEncoder(json.JSONEncoder):
+    """JSON encoder that handles HA attribute types."""
+
+    def default(self, o: Any) -> Any:
+        if isinstance(o, datetime):
+            return o.isoformat()
+        if isinstance(o, set):
+            return list(o)
+        return super().default(o)
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: NatsIoConfigEntry) -> bool:
     """Set up NATS from a config entry."""
     host = entry.data[CONF_HOST]
@@ -170,7 +181,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: NatsIoConfigEntry) -> bo
             response = state_payload
 
         try:
-            await nc.publish(msg.reply, json.dumps(response).encode())
+            await nc.publish(msg.reply, json.dumps(response, cls=_HAEncoder).encode())
         except Exception as err:
             _LOGGER.warning("Failed to publish state response to NATS: %s", err)
 
@@ -190,7 +201,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: NatsIoConfigEntry) -> bo
         payload = state_payload
 
         try:
-            await nc.publish(subject, json.dumps(payload).encode())
+            await nc.publish(subject, json.dumps(payload, cls=_HAEncoder).encode())
         except Exception as err:
             _LOGGER.warning("Failed to publish state change to NATS: %s", err)
 
