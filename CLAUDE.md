@@ -11,6 +11,7 @@ This is a Home Assistant custom integration (`nats_io`) that bridges Home Assist
 - `custom_components/nats_io/manifest.json` — integration metadata and pip requirements
 - `custom_components/nats_io/strings.json` — UI strings (source of truth; translations derive from this)
 - `custom_components/nats_io/translations/en.json` — English translations
+- `tests/nats_io/conftest.py` — shared test fixtures
 - `tests/nats_io/test_config_flow.py` — config flow tests
 
 ## Development
@@ -40,6 +41,12 @@ This rsync's `custom_components/nats_io/` to the configured HA host. The target 
 - **Subject:** `ha.service`
 - **Payload:** `{ "action": "<domain>.<service>", "target": {...}, "data": {...} }`
   - `action` is required; `target` and `data` are optional
+
+### State requests
+- **Subject:** `ha.request.state`
+- **Request payload:** `{ "entity_id": "<entity_id>" }` — `entity_id` is required
+- **Response payload:** same fields as a state change event (`timestamp`, `entity_id`, `device_id`, `area_id`, `state`, `attributes`, `last_changed`), or `{ "error": "..." }` if the entity is not found
+- Requires a NATS reply subject; messages without one are ignored
 
 **If the subject format or payload schema changes, update `README.md` accordingly.**
 

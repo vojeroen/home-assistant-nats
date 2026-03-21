@@ -6,6 +6,7 @@ Connects Home Assistant to a [NATS](https://nats.io) message broker, enabling bi
 
 - **State changes** are published to NATS so external systems can react to what happens in Home Assistant.
 - **Service calls** can be triggered from NATS to control Home Assistant devices and automations.
+- **State requests** can be made from NATS to query the current state of any entity on demand.
 
 ## Prerequisites
 
@@ -142,6 +143,7 @@ Request the current state of any entity by publishing to `ha.request.state` with
 
 ```json
 {
+  "timestamp": "2024-01-15T12:34:56.789012+00:00",
   "entity_id": "light.living_room",
   "device_id": "a1b2c3d4e5f6",
   "area_id": "living_room",
