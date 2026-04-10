@@ -16,6 +16,8 @@ A running NATS broker (version 2.x or later) accessible from your Home Assistant
 
 ### HACS (recommended)
 
+[![Open your Home Assistant instance and open this repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=vojeroen&repository=home-assistant-nats)
+
 1. Open HACS in Home Assistant.
 2. Go to **Integrations** → **⋮** → **Custom repositories**.
 3. Add `https://github.com/vojeroen/home-assistant-nats` with category **Integration**.
