@@ -12,6 +12,9 @@ Connects Home Assistant to a [NATS](https://nats.io) message broker, enabling bi
 
 A running NATS broker (version 2.x or later) accessible from your Home Assistant instance. Authentication via username/password is required. TLS is supported and enabled by default.
 
+> [!CAUTION]
+> This integration allows anyone with access to the `ha.>` topics on the NATS broker to read and modify entity states in Home Assistant. You are responsible for properly securing your NATS broker.
+
 ## Installation
 
 ### HACS (recommended)
