@@ -1,13 +1,17 @@
 {
   "domain": "nats_io",
   "name": "NATS",
-  "codeowners": ["@vojeroen"],
+  "codeowners": [
+    "@vojeroen"
+  ],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/vojeroen/home-assistant-nats",
-  "issue_tracker": "https://github.com/vojeroen/home-assistant-nats/issues",
   "integration_type": "service",
   "iot_class": "local_push",
-  "requirements": ["nats-py==2.14.0"],
+  "issue_tracker": "https://github.com/vojeroen/home-assistant-nats/issues",
+  "requirements": [
+    "nats-py==2.14.0"
+  ],
   "version": "0.1.5"
 }
